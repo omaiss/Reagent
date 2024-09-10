@@ -1,30 +1,47 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<!--&lt;!&ndash; Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html &ndash;&gt;-->
+<!--<idea-plugin>-->
+<!--  &lt;!&ndash; Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. &ndash;&gt;-->
+<!--  <id>com.example.MVP</id>-->
+
+<!--  &lt;!&ndash; Public plugin name should be written in Title Case.-->
+<!--       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name &ndash;&gt;-->
+<!--  <name>MVP</name>-->
+
+<!--  &lt;!&ndash; A displayed Vendor name or Organization ID displayed on the Plugins Page. &ndash;&gt;-->
+<!--  <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>-->
+
+<!--  &lt;!&ndash; Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.-->
+<!--       Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.-->
+<!--       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description &ndash;&gt;-->
+<!--  <description><![CDATA[-->
+<!--    Enter short description for your plugin here.<br>-->
+<!--    <em>most HTML tags may be used</em>-->
+<!--  ]]></description>-->
+
+<!--  &lt;!&ndash; Product and plugin compatibility requirements.-->
+<!--       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html &ndash;&gt;-->
+<!--  <depends>com.intellij.modules.platform</depends>-->
+
+<!--  &lt;!&ndash; Extension points defined by the plugin.-->
+<!--       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html &ndash;&gt;-->
+<!--  <extensions defaultExtensionNs="com.intellij">-->
+
+<!--  </extensions>-->
+<!--</idea-plugin>-->
+
 <idea-plugin>
-  <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-  <id>com.example.MVP</id>
+    <id>com.example.mvp</id>
+    <name>MVP</name>
+    <version>1.0.0</version>
+    <vendor email="you@example.com" url="http://yourwebsite.com">Your Name</vendor>
+    <description>The plugin will detect code vunerabilities and help format the code using PEP8 coding standards
+    </description>
 
-  <!-- Public plugin name should be written in Title Case.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-  <name>MVP</name>
-
-  <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
-
-  <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-       Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-  <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-  ]]></description>
-
-  <!-- Product and plugin compatibility requirements.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-  <depends>com.intellij.modules.platform</depends>
-
-  <!-- Extension points defined by the plugin.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-  <extensions defaultExtensionNs="com.intellij">
-
-  </extensions>
+    <!-- Register actions, extensions, etc. -->
+    <actions>
+        <action id="com.example.mvp.DisplayPopupAction" class="com.example.mvp.DisplayPopupAction" text="Show Popup"
+                description="Show Popup Message">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
