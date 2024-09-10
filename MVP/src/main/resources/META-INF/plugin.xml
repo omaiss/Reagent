@@ -27,9 +27,8 @@
 
     </extensions>
     <actions>
-        <action id="com.example.demo2.MyPluginAction" class="org.example.mvp.DisplayPlugin" text="Show Greeting"
-                description="Displays a greeting message">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        <action id="helloworld" class="actions.DisplayPlugin" text="Show Greeting">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
     </actions>
 
