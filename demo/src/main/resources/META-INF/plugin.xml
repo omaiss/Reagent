@@ -1,0 +1,43 @@
+<!--&lt;!&ndash; Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html &ndash;&gt;-->
+<!--<idea-plugin>-->
+<!--    &lt;!&ndash; Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. &ndash;&gt;-->
+<!--    <id>org.example.demo</id>-->
+
+<!--    &lt;!&ndash; Public plugin name should be written in Title Case.-->
+<!--         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name &ndash;&gt;-->
+<!--    <name>Demo</name>-->
+
+<!--    &lt;!&ndash; A displayed Vendor name or Organization ID displayed on the Plugins Page. &ndash;&gt;-->
+<!--    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>-->
+
+<!--    &lt;!&ndash; Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.-->
+<!--         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.-->
+<!--         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description &ndash;&gt;-->
+<!--    <description><![CDATA[-->
+<!--    Enter short description for your plugin here.<br>-->
+<!--    <em>most HTML tags may be used</em>-->
+<!--  ]]></description>-->
+
+<!--    &lt;!&ndash; Product and plugin compatibility requirements.-->
+<!--         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html &ndash;&gt;-->
+<!--    <depends>com.intellij.modules.platform</depends>-->
+
+<!--    &lt;!&ndash; Extension points defined by the plugin.-->
+<!--         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html &ndash;&gt;-->
+<!--    <extensions defaultExtensionNs="com.intellij">-->
+
+<!--    </extensions>-->
+<!--</idea-plugin>-->
+
+<idea-plugin>
+    <id>fyp</id>
+    <name>Reagent</name>
+    <version>1.0</version>
+    <vendor email="support@example.com" url="https://example.com">Example</vendor>
+    <description>This is a sample PyCharm plugin that I will be making.</description>
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator language="" implementationClass="fyp.PEP8Annotator"/>
+    </extensions>
+</idea-plugin>
