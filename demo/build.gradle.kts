@@ -16,11 +16,11 @@ repositories {
 intellij {
     version.set("2024.1.7")
     type.set("PY")
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(listOf("python"))
 }
 
 dependencies {
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("org.jetbrains:annotations:24.0.1")
 }
 
 tasks {
