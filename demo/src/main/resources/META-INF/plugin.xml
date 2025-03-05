@@ -36,6 +36,9 @@
     <vendor email="support@example.com" url="https://example.com">Example</vendor>
     <description>This is a sample PyCharm plugin that I will be making.</description>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.python</depends>
+
+
 
     <extensions defaultExtensionNs="com.intellij">
         <annotator language="" implementationClass="fyp.PEP8Annotator"/>

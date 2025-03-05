@@ -16,11 +16,11 @@ repositories {
 intellij {
     version.set("2024.1.7")
     type.set("PY")
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(listOf("python"))
 }
 
 dependencies {
-
+    implementation("org.jetbrains:annotations:24.0.1")
 }
 
 tasks {
