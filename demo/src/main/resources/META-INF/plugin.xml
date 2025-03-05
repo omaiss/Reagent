@@ -42,5 +42,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <annotator language="" implementationClass="fyp.PEP8Annotator"/>
+        <editorFactoryDocumentListener implementation="fyp.AITalker"/>
     </extensions>
 </idea-plugin>
