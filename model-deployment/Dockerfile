@@ -1,43 +1,17 @@
-# Stage 1: Base image with Python and dependencies
-FROM python:3.9-slim as base
+# Use an official Python runtime as the base image
+FROM python:3.9-slim
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies
+RUN pip install torch transformers
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the downloaded model and tokenizer into the container
+COPY fine-tuned-model /app/fine-tuned-model
 
-# Stage 2: Download the model and tokenizer
-FROM base as model_downloader
+# Copy the Python script to load and use the model
+COPY server.py /app/server.py
 
-# Install transformers library
-RUN pip install --no-cache-dir transformers
-
-# Download and save the model and tokenizer
-RUN python -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
-model_id = 'FYPFAST/Llama-3.2-3B-Instruct-PEP8-Vulnerability-Python'; \
-model = AutoModelForCausalLM.from_pretrained(model_id); \
-tokenizer = AutoTokenizer.from_pretrained(model_id); \
-model.save_pretrained('./fine-tuned-model'); \
-tokenizer.save_pretrained('./fine-tuned-model')"
-
-# Stage 3: Final image with the FastAPI app
-FROM base as final
-
-# Copy the downloaded model and tokenizer from the previous stage
-COPY --from=model_downloader /app/fine-tuned-model /app/fine-tuned-model
-
-# Copy the FastAPI application code
-COPY . .
-
-# Expose the port
-EXPOSE 8000
-
-# Command to run the FastAPI app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the script
+CMD ["python", "server.py"]
