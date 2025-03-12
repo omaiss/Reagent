@@ -24,12 +24,15 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class AITalker implements DocumentListener {
-    private static final String HUGGING_FACE_API_URL = "https://api-inference.huggingface.co/models/FYPFAST/Llama-3.2-8B-Instruct-PEP8-Vulnerability-Python";
-    private static final String HUGGING_FACE_API_KEY = System.getenv("HUGGING_FACE_API_KEY"); // Use environment variable
     private static final Logger log = LoggerFactory.getLogger(AITalker.class);
-
+    private static String REMOTE_MODEL_URL = "https://flying-pig-skin-journals.trycloudflare.com/generate";
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> scheduledTask = null;
+
+    public static void setRemoteModelURL(String url) {
+        REMOTE_MODEL_URL = url;
+        log.info("Updated Remote Model URL: " + url);
+    }
 
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
@@ -42,14 +45,15 @@ public class AITalker implements DocumentListener {
     private void processDocumentChange(DocumentEvent event) {
         VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(event.getDocument());
         if (virtualFile == null) return;
-
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
         String code = event.getDocument().getText();
 
         try {
-            String response = analyzeCodeWithModel(code);
+            String prompt = "Analyze the following Python code for PEP8 violations and security vulnerabilities:\n\n" + code;
+            String response = analyzeCodeWithModel(prompt);
             saveResponseToFile(project, response);
             AnalysisResult result = parseAnalysisResult(response);
+
             if (result.corrected_code != null && !result.corrected_code.isEmpty()) {
                 updateDocument(project, result.corrected_code);
             }
@@ -60,42 +64,35 @@ public class AITalker implements DocumentListener {
         }
     }
 
-    private String analyzeCodeWithModel(String code) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
-        String prompt = "Analyze the following Python code for PEP8 violations and security vulnerabilities. " +
-                "Return the corrected code and a list of issues found:\n\n" + code;
-
-        String json = "{"
-                + "\"inputs\": \"" + prompt.replace("\"", "\\\"") + "\","
-                + "\"parameters\": {\"max_new_tokens\": 500, \"temperature\": 0.5}"
-                + "}";
-
-        RequestBody body = RequestBody.create(json, JSON);
-
-        Request request = new Request.Builder()
-                .url(HUGGING_FACE_API_URL)
-                .post(body)
-                .addHeader("Authorization", "Bearer " + HUGGING_FACE_API_KEY)
+    private String analyzeCodeWithModel(String prompt) throws IOException {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.MINUTES)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String json = objectMapper.writeValueAsString(new RequestPayload(prompt));
+        RequestBody body = RequestBody.create(json, MediaType.parse("application/json; charset=utf-8"));
+        Request request = new Request.Builder().url(REMOTE_MODEL_URL).post(body).build();
 
         int retries = 3;
         while (retries > 0) {
             try (Response response = client.newCall(request).execute()) {
-                if (response.isSuccessful()) {
-                    return response.body() != null ? response.body().string() : "";
+                if (response.isSuccessful() && response.body() != null) {
+                    return response.body().string();
                 } else if (response.code() == 503) {
                     log.warn("API unavailable. Retrying...");
                     retries--;
-                    Thread.sleep(5000); // Wait 5 seconds before retrying
+                    Thread.sleep(5000);
                 } else {
-                    String errorBody = response.body() != null ? response.body().string() : "Unknown error";
-                    log.error("API Error {}: {}", response.code(), errorBody);
+                    log.error("API Error {}: {}", response.code(), response.body() != null ? response.body().string() : "Unknown error");
                     return "";
                 }
             } catch (InterruptedException e) {
                 log.error("Retry interrupted: ", e);
+                Thread.currentThread().interrupt();
                 return "";
             }
         }
@@ -126,9 +123,9 @@ public class AITalker implements DocumentListener {
 
     private void updateDocument(Project project, String correctedCode) {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        if (editor == null) return;
-
-        editor.getDocument().setText(correctedCode);
+        if (editor != null) {
+            editor.getDocument().setText(correctedCode);
+        }
     }
 
     private void highlightViolations(Project project, List<Violation> violations) {
@@ -136,13 +133,7 @@ public class AITalker implements DocumentListener {
         if (editor == null) return;
 
         for (Violation violation : violations) {
-            int startOffset = editor.getDocument().getLineStartOffset(violation.line - 1);
-            int endOffset = editor.getDocument().getLineEndOffset(violation.line - 1);
-            TextAttributes attributes = new TextAttributes(null, JBColor.YELLOW, null, null, Font.PLAIN);
-            RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(
-                    startOffset, endOffset, HighlighterLayer.ERROR, attributes, HighlighterTargetArea.EXACT_RANGE
-            );
-            highlighter.setErrorStripeTooltip("PEP 8 Violation: " + violation.message);
+            highlightText(editor, violation.line, JBColor.YELLOW, "PEP 8 Violation: " + violation.message);
         }
     }
 
@@ -151,29 +142,42 @@ public class AITalker implements DocumentListener {
         if (editor == null) return;
 
         for (Vulnerability vulnerability : vulnerabilities) {
-            int startOffset = editor.getDocument().getLineStartOffset(vulnerability.line - 1);
-            int endOffset = editor.getDocument().getLineEndOffset(vulnerability.line - 1);
-            TextAttributes attributes = new TextAttributes(null, JBColor.RED, null, null, Font.PLAIN);
-            RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(
-                    startOffset, endOffset, HighlighterLayer.ERROR, attributes, HighlighterTargetArea.EXACT_RANGE
-            );
-            highlighter.setErrorStripeTooltip("Vulnerability: " + vulnerability.message);
+            highlightText(editor, vulnerability.line, JBColor.RED, "Vulnerability: " + vulnerability.message);
+        }
+    }
+
+    private void highlightText(Editor editor, int line, Color color, String tooltip) {
+        int startOffset = editor.getDocument().getLineStartOffset(line - 1);
+        int endOffset = editor.getDocument().getLineEndOffset(line - 1);
+        TextAttributes attributes = new TextAttributes(null, color, null, null, Font.PLAIN);
+        RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(
+                startOffset, endOffset, HighlighterLayer.ERROR, attributes, HighlighterTargetArea.EXACT_RANGE
+        );
+        highlighter.setErrorStripeTooltip(tooltip);
+    }
+
+    private static class RequestPayload {
+        public String prompt;
+        public RequestPayload(String prompt) {
+            this.prompt = prompt;
         }
     }
 
     private static class AnalysisResult {
-        String corrected_code;
-        List<Violation> violations;
-        List<Vulnerability> vulnerabilities;
+        public String corrected_code;
+        public List<Violation> violations;
+        public List<Vulnerability> vulnerabilities;
     }
 
     private static class Violation {
-        int line, column;
-        String message;
+        public int line;
+        public int column;
+        public String message;
     }
 
     private static class Vulnerability {
-        int line, column;
-        String message;
+        public int line;
+        public int column;
+        public String message;
     }
 }

@@ -21,6 +21,7 @@ intellij {
 
 dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 tasks {
