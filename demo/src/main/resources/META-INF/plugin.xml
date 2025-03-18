@@ -39,7 +39,8 @@
     <depends>com.intellij.modules.python</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <annotator language="" implementationClass="fyp.PEP8Annotator"/>
-        <editorFactoryDocumentListener implementation="fyp.AITalker"/>
+<!--        <annotator language="" implementationClass="fyp.AIResponseAnnotator"/>-->
+        <annotator language="Python" implementationClass="fyp.Flake8Highlight"/>
+        <!--        <editorFactoryDocumentListener implementation="fyp.AITalker"/>-->
     </extensions>
 </idea-plugin>

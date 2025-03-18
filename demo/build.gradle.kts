@@ -1,27 +1,29 @@
 plugins {
-    id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.intellij") version "1.17.4" // Use the latest version
+    kotlin("jvm") version "1.9.0"
 }
-
 group = "org.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
+
+
 intellij {
-    version.set("2024.1.7")
-    type.set("PY")
-    plugins.set(listOf("python"))
+    type.set("PC") // PC stands for PyCharm Community Edition
+    version.set("2024.2.3") // Match your installed PyCharm CE version
+    plugins.set(listOf("PythonCore")) // Ensure Python support is enabled
 }
 
 dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 }
 
 tasks {
