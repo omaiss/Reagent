@@ -31,6 +31,12 @@ public class Flake8Highlight implements Annotator {
         String code = file.getText();
 
         List<Violation> violations = executeFlake8(code);
+        List<String> violations_strings = new ArrayList<>();
+
+        for (Violation violation : violations) {
+            violations_strings.add(violation.line + " : " + violation.message + '\n');
+        }
+
         for (Violation violation : violations) {
             int lineNumber = violation.line - 1;
             if (lineNumber < document.getLineCount()) {
@@ -43,7 +49,7 @@ public class Flake8Highlight implements Annotator {
 
                     holder.newAnnotation(HighlightSeverity.WARNING, "PEP8 Violation: " + violation.message)
                             .range(targetElement.getTextRange())
-                            .withFix(new AIQuickFix())
+                            .withFix(new AIQuickFix(violations_strings))
                             .create();
                 }
             }
@@ -74,6 +80,13 @@ public class Flake8Highlight implements Annotator {
     }
 
     private List<String> getFlake8Output(String code) throws IOException, InterruptedException {
+        // Ensure Flake8 is installed before running
+        ProcessBuilder installPb = new ProcessBuilder("python", "-m", "pip", "install", "--quiet", "flake8");
+        installPb.redirectErrorStream(true);
+        Process installProcess = installPb.start();
+        installProcess.waitFor();
+
+        // Run Flake8
         ProcessBuilder pb = new ProcessBuilder("python", "-m", "flake8", "--format=%(row)d:%(col)d: %(code)s %(text)s", "-");
         pb.redirectErrorStream(true);
         Process process = pb.start();
