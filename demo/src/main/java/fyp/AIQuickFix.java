@@ -70,11 +70,21 @@ public class AIQuickFix implements IntentionAction {
                         return;
                     }
 
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(aiSuggestedCode);
-                    String formattedCode = jsonNode.get("ai_response").asText();
-                    formattedCode = formattedCode.replaceAll("^```python\\s*", "").replaceAll("\\s*```$", "").trim();
-                    if (formattedCode.trim().isEmpty()) {
+                    String formattedCode = aiSuggestedCode.replaceAll("^\"```python\\s*", "")
+                            .replaceAll("\\s*```\"$", "")
+                            .trim();
+
+                    formattedCode = formattedCode.replace("\\n", "\n")
+                            .replace("\\\"", "\"")  // Fix escaped double quotes
+                            .replace("\\'", "'");   // Fix escaped single quotes
+
+                    // Remove explanation if it exists
+                    int explanationIndex = formattedCode.lastIndexOf("'''");
+                    if (explanationIndex != -1) {
+                        formattedCode = formattedCode.substring(0, explanationIndex).trim();
+                    }
+
+                    if (formattedCode.isEmpty()) {
                         showError("AI response was empty or invalid.");
                         return;
                     }

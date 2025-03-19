@@ -40,6 +40,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
 <!--        <annotator language="" implementationClass="fyp.AIResponseAnnotator"/>-->
-        <annotator language="Python" implementationClass="fyp.Flake8Highlight"/>
+    <toolWindow id="Reagent Summary" factoryClass="fyp.Reagent_Summary" anchor="right" />
+    <annotator language="Python" implementationClass="fyp.Flake8Highlight"/>
     </extensions>
 </idea-plugin>
