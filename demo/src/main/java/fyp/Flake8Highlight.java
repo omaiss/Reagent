@@ -1,16 +1,10 @@
 package fyp;
 
-import com.github.weisj.jsvg.L;
 import com.intellij.lang.annotation.*;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.jetbrains.python.psi.PyFile;
-import it.unimi.dsi.fastutil.bytes.V;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

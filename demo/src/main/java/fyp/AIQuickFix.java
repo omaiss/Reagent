@@ -108,6 +108,7 @@ public class AIQuickFix implements IntentionAction {
                     // ✅ Log the interaction: problem (prompt) + solution (aiSuggestedCode)
                     logWriter.logInteraction(prompt, aiSuggestedCode);
                     System.out.println("Interaction logged successfully.");
+                    Flake8Highlight.setVulnerabilities(null);
 
                 } catch (Exception e) {
                     showError("Error processing AI response: " + e.getMessage());
