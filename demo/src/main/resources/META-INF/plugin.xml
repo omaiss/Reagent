@@ -41,6 +41,7 @@
     <extensions defaultExtensionNs="com.intellij">
 <!--        <annotator language="" implementationClass="fyp.AIResponseAnnotator"/>-->
     <toolWindow id="Reagent Summary" factoryClass="fyp.Reagent_Summary" anchor="right" />
+    <toolWindow id="Reagent Solution Ranking" factoryClass="fyp.Reagent_Solution_Ranking" anchor="right" />
     <annotator language="Python" implementationClass="fyp.Flake8Highlight"/>
     </extensions>
 </idea-plugin>
