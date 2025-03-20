@@ -10,12 +10,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.jetbrains.python.psi.PyFile;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.util.*;
 
 public class Flake8Highlight implements Annotator {
     private static final TextAttributesKey ERROR_ATTRIBUTES = TextAttributesKey.createTextAttributesKey("FLAKE8_ERROR", CodeInsightColors.ERRORS_ATTRIBUTES);
+    private final AITalker aiTalker = new AITalker();
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
@@ -23,13 +23,11 @@ public class Flake8Highlight implements Annotator {
             return;
         }
         PyFile file = (PyFile) element;
-
         Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
         if (document == null) {
             return;
         }
         String code = file.getText();
-
         List<Violation> violations = executeFlake8(code);
         List<String> violations_strings = new ArrayList<>();
 
@@ -41,21 +39,18 @@ public class Flake8Highlight implements Annotator {
             int lineNumber = violation.line - 1;
             if (lineNumber < document.getLineCount()) {
                 int lineStartOffset = document.getLineStartOffset(lineNumber);
-                System.out.println("Line Start Offset: " + lineStartOffset);
-
                 PsiElement targetElement = file.findElementAt(lineStartOffset);
                 if (targetElement != null) {
-                    System.out.println(targetElement.getTextRange());
-
                     holder.newAnnotation(HighlightSeverity.WARNING, "PEP8 Violation: " + violation.message)
                             .range(targetElement.getTextRange())
-                            .withFix(new AIQuickFix(violations_strings))
+                            .withFix(new AIQuickFix(violations_strings, "pep8"))
+                            .withFix(new AIQuickFix(violations_strings, "vulnerabilities"))
+                            .withFix(new AIQuickFix(violations_strings, "both"))
                             .create();
                 }
             }
         }
     }
-
 
     private List<Violation> executeFlake8(String code) {
         List<Violation> violations = new ArrayList<>();
@@ -69,8 +64,7 @@ public class Flake8Highlight implements Annotator {
                         int colNum = Integer.parseInt(parts[1].trim());
                         String message = parts[2].trim();
                         violations.add(new Violation(lineNum, colNum, message));
-                    } catch (NumberFormatException ignored) {
-                    }
+                    } catch (NumberFormatException ignored) {}
                 }
             }
         } catch (IOException | InterruptedException e) {
@@ -80,13 +74,6 @@ public class Flake8Highlight implements Annotator {
     }
 
     private List<String> getFlake8Output(String code) throws IOException, InterruptedException {
-        // Ensure Flake8 is installed before running
-        ProcessBuilder installPb = new ProcessBuilder("python", "-m", "pip", "install", "--quiet", "flake8");
-        installPb.redirectErrorStream(true);
-        Process installProcess = installPb.start();
-        installProcess.waitFor();
-
-        // Run Flake8
         ProcessBuilder pb = new ProcessBuilder("python", "-m", "flake8", "--format=%(row)d:%(col)d: %(code)s %(text)s", "-");
         pb.redirectErrorStream(true);
         Process process = pb.start();
@@ -97,7 +84,6 @@ public class Flake8Highlight implements Annotator {
         }
 
         process.waitFor();
-
         List<String> outputLines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
