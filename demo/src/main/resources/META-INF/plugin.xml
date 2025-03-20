@@ -44,4 +44,13 @@
     <toolWindow id="Reagent Solution Ranking" factoryClass="fyp.Reagent_Solution_Ranking" anchor="right" />
     <annotator language="Python" implementationClass="fyp.Flake8Highlight"/>
     </extensions>
+    <actions>
+        <action id="fyp.DetectVulnerabilitiesAction"
+                class="fyp.DetectVulnerabilitiesAction"
+                text="Detect Vulnerabilities"
+                description="Runs AI-based vulnerability detection on Python code">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+
 </idea-plugin>

@@ -12,6 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.jetbrains.python.psi.PyFile;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 import java.util.Arrays;
@@ -28,10 +29,14 @@ public class AIQuickFix implements IntentionAction {
     @Override
     public @NotNull String getText() {
         switch (fixType) {
-            case "pep8": return "Fix PEP8 Violations";
-            case "vulnerabilities": return "Fix Vulnerabilities";
-            case "both": return "Fix PEP8 & Vulnerabilities";
-            default: return "Apply AI Suggested Code";
+            case "pep8":
+                return "Fix PEP8 Violations";
+            case "vulnerabilities":
+                return "Fix Vulnerabilities";
+            case "both":
+                return "Fix PEP8 & Vulnerabilities";
+            default:
+                return "Apply AI Suggested Code";
         }
     }
 
@@ -71,19 +76,19 @@ public class AIQuickFix implements IntentionAction {
                     case "pep8":
                         prompt = "The following code has PEP8 violations." +
                                 "Fix them and return the corrected code only (NO EXPLANATION).\n\n" +
-                                "Violations:\nLine Number : Violation\n" + violationsText + "\n\nCode:\n" + userCode;
+                                "Violations:\n" + violationsText + "\n\nCode:\n" + userCode;
                         break;
                     case "vulnerabilities":
                         prompt = "The following code has security vulnerabilities. " +
                                 "Fix only the vulnerable parts and return the corrected code only (NO EXPLANATION).\n\n" +
-                                "Vulnerabilities:\n"+
-                                "Line Number : Violation\n"+
+                                "Vulnerabilities:\n" +
+                                violationsText +
                                 "Code:\n" + userCode;
                         break;
                     case "both":
                         prompt = "The following code has both PEP8 violations and security vulnerabilities. " +
                                 "Fix them all and return the corrected code only (NO EXPLANATION).\n\n" +
-                                "Violations:\nLine Number : Violation\n" + violationsText + "\n\nCode:\n" + userCode;
+                                "Violations:\n" + violationsText + "\n\nCode:\n" + userCode;
                         break;
                     default:
                         prompt = userCode;
