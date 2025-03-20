@@ -69,19 +69,21 @@ public class AIQuickFix implements IntentionAction {
                 String prompt;
                 switch (fixType) {
                     case "pep8":
-                        prompt = "The following code has PEP8 violations. " +
+                        prompt = "The following code has PEP8 violations." +
                                 "Fix them and return the corrected code only (NO EXPLANATION).\n\n" +
-                                "Violations:\n" + violationsText + "\n\nCode:\n" + userCode;
+                                "Violations:\nLine Number : Violation\n" + violationsText + "\n\nCode:\n" + userCode;
                         break;
                     case "vulnerabilities":
                         prompt = "The following code has security vulnerabilities. " +
                                 "Fix only the vulnerable parts and return the corrected code only (NO EXPLANATION).\n\n" +
+                                "Vulnerabilities:\n"+
+                                "Line Number : Violation\n"+
                                 "Code:\n" + userCode;
                         break;
                     case "both":
                         prompt = "The following code has both PEP8 violations and security vulnerabilities. " +
                                 "Fix them all and return the corrected code only (NO EXPLANATION).\n\n" +
-                                "Violations:\n" + violationsText + "\n\nCode:\n" + userCode;
+                                "Violations:\nLine Number : Violation\n" + violationsText + "\n\nCode:\n" + userCode;
                         break;
                     default:
                         prompt = userCode;
@@ -142,7 +144,6 @@ public class AIQuickFix implements IntentionAction {
         } else {
             response = ""; // If there are only 1-2 lines, return an empty string
         }
-
 
         return response.trim();
     }
