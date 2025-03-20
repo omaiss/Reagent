@@ -13,12 +13,12 @@ import com.intellij.psi.PsiDocumentManager;
 import com.jetbrains.python.psi.PyFile;
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
-
 import java.util.Arrays;
 
 public class AIQuickFix implements IntentionAction {
     private final List<String> violations;
     private final String fixType;
+    private static final LogWriter logWriter = LogWriter.getInstance();  // Singleton LogWriter
 
     public AIQuickFix(List<String> violations, String fixType) {
         this.violations = violations;
@@ -28,10 +28,14 @@ public class AIQuickFix implements IntentionAction {
     @Override
     public @NotNull String getText() {
         switch (fixType) {
-            case "pep8": return "Fix PEP8 Violations";
-            case "vulnerabilities": return "Fix Vulnerabilities";
-            case "both": return "Fix PEP8 & Vulnerabilities";
-            default: return "Apply AI Suggested Code";
+            case "pep8":
+                return "Fix PEP8 Violations";
+            case "vulnerabilities":
+                return "Fix Vulnerabilities";
+            case "both":
+                return "Fix PEP8 & Vulnerabilities";
+            default:
+                return "Apply AI Suggested Code";
         }
     }
 
@@ -96,10 +100,14 @@ public class AIQuickFix implements IntentionAction {
                         return;
                     }
 
-                    // **Fix formatting issues in AI response**
+                    // Clean AI response and apply the fix
                     aiSuggestedCode = cleanAIResponse(aiSuggestedCode);
-
                     updateDocument(document, aiSuggestedCode, project);
+
+                    // ✅ Log the interaction: problem (prompt) + solution (aiSuggestedCode)
+                    logWriter.logInteraction(prompt, aiSuggestedCode);
+                    System.out.println("Interaction logged successfully.");
+
                 } catch (Exception e) {
                     showError("Error processing AI response: " + e.getMessage());
                 }
@@ -147,6 +155,4 @@ public class AIQuickFix implements IntentionAction {
 
         return response.trim();
     }
-
-
 }
