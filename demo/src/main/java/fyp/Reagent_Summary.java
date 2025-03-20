@@ -1,7 +1,5 @@
 package fyp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.*;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -22,17 +20,13 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 public class Reagent_Summary implements ToolWindowFactory {
     private JButton refreshButton;
     private Tree summaryTree;
     private Project project;
-
-    public Reagent_Summary() {
-        ObjectMapper objectMapper = new ObjectMapper();
-    }
+    private static final LogWriter logWriter = LogWriter.getInstance();
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
@@ -69,13 +63,12 @@ public class Reagent_Summary implements ToolWindowFactory {
                     try {
                         String codeToSummarize = getSelectedCode();
                         if (codeToSummarize.isEmpty()) {
-                            SwingUtilities.invokeLater(() -> updateSummary(" Please select code to generate a summary."));
+                            SwingUtilities.invokeLater(() -> updateSummary("Please select code to generate a summary."));
                             return;
                         }
 
                         String fullPrompt = "Generate a structured summary with the following headings: Vulnerabilities, PEP8 Violations, Fixes, and Summary of the Code. Ensure consistency in formatting. Do not include extra explanations, --- lines or code—just the categorized summary.\n\n" + codeToSummarize;
 
-                        System.out.println("Code sent for summary: " + fullPrompt);
                         AITalker aiTalker = new AITalker();
                         String summary = aiTalker.analyzeCodeWithModel(fullPrompt);
                         SwingUtilities.invokeLater(() -> updateSummary(summary));
@@ -89,9 +82,7 @@ public class Reagent_Summary implements ToolWindowFactory {
                     }
                 }
             });
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -107,9 +98,8 @@ public class Reagent_Summary implements ToolWindowFactory {
                 line = line.trim().replaceAll("^\"|\"$", ""); // Remove quotes
                 if (line.isEmpty()) continue;
 
-                // Add section icons
                 if (line.equalsIgnoreCase("**Vulnerabilities**")) {
-                    root.add(new DefaultMutableTreeNode("\uD83D\uDCA1 Vulnerabilities"));
+                    root.add(new DefaultMutableTreeNode("💡 Vulnerabilities"));
                 } else if (line.equalsIgnoreCase("**PEP8 Violations**")) {
                     root.add(new DefaultMutableTreeNode("⚠️ PEP8 Violations"));
                 } else if (line.equalsIgnoreCase("**Fixes**")) {
@@ -124,6 +114,36 @@ public class Reagent_Summary implements ToolWindowFactory {
             root.add(new DefaultMutableTreeNode("⚠️ Error parsing response: " + e.getMessage()));
         }
 
+        DefaultMutableTreeNode lastNode = new DefaultMutableTreeNode("🚀 User Journey");
+        List<String> userJourneyLogs = logWriter.getUserJourneyLogs();  // Fetch logs
+
+        if (userJourneyLogs == null || userJourneyLogs.isEmpty()) {
+            lastNode.add(new DefaultMutableTreeNode("No interactions yet."));
+        } else {
+            int logNumber = 1;
+            for (String log : userJourneyLogs) {
+                String cleanedLog = log.replace("\n", " ").replace("\"", "");
+                cleanedLog = logNumber + ") " + cleanedLog;
+                logNumber++;
+
+                String[] parts = cleanedLog.split("Problem:");
+                if (parts.length > 1) {
+                    String[] problemSolution = parts[1].split("Solution:");
+                    if (problemSolution.length == 2) {
+                        lastNode.add(new DefaultMutableTreeNode("Problem:"));
+                        lastNode.add(new DefaultMutableTreeNode(problemSolution[0].trim()));
+                        lastNode.add(new DefaultMutableTreeNode("Solution:"));
+                        lastNode.add(new DefaultMutableTreeNode(problemSolution[1].trim()));
+                    } else {
+                        lastNode.add(new DefaultMutableTreeNode(cleanedLog));
+                    }
+                } else {
+                    lastNode.add(new DefaultMutableTreeNode(cleanedLog));
+                }
+            }
+        }
+        root.add(lastNode);
+
         summaryTree.setModel(new DefaultTreeModel(root));
         summaryTree.updateUI();
     }
@@ -137,19 +157,5 @@ public class Reagent_Summary implements ToolWindowFactory {
             }
             return "";
         }).executeSynchronously();
-    }
-
-    private static class RequestPayload {
-        public String prompt;
-        public RequestPayload(String prompt) {
-            this.prompt = prompt;
-        }
-    }
-
-    private static class ResponsePayload {
-        public String ai_response;
-        public ResponsePayload(String ai_response) {
-            this.ai_response = ai_response;
-        }
     }
 }
