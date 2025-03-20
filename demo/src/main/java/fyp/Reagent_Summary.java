@@ -100,14 +100,25 @@ public class Reagent_Summary implements ToolWindowFactory {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("📋 AI Generated Summary");
 
         try {
-            String aiText = response.trim();
-            aiText = aiText.replace("\\n", "\n").replace("\\\"", "\"");
-
+            String aiText = response.trim().replace("\\n", "\n").replace("\\\"", "\"");
             String[] lines = aiText.split("\n");
+
             for (String line : lines) {
-                line = line.trim();
+                line = line.trim().replaceAll("^\"|\"$", ""); // Remove quotes
                 if (line.isEmpty()) continue;
-                root.add(new DefaultMutableTreeNode(line));
+
+                // Add section icons
+                if (line.equalsIgnoreCase("**Vulnerabilities**")) {
+                    root.add(new DefaultMutableTreeNode("\uD83D\uDCA1 Vulnerabilities"));
+                } else if (line.equalsIgnoreCase("**PEP8 Violations**")) {
+                    root.add(new DefaultMutableTreeNode("⚠️ PEP8 Violations"));
+                } else if (line.equalsIgnoreCase("**Fixes**")) {
+                    root.add(new DefaultMutableTreeNode("✅ Fixes"));
+                } else if (line.equalsIgnoreCase("**Summary of the Code**")) {
+                    root.add(new DefaultMutableTreeNode("📌 Code Summary"));
+                } else {
+                    root.add(new DefaultMutableTreeNode(line));
+                }
             }
         } catch (Exception e) {
             root.add(new DefaultMutableTreeNode("⚠️ Error parsing response: " + e.getMessage()));
