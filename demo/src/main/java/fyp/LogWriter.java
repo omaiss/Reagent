@@ -2,7 +2,6 @@ package fyp;
 
 import java.util.List;
 import java.util.ArrayList;
-// Class updated
 
 public class LogWriter {
     private static final LogWriter instance = new LogWriter();
@@ -33,12 +32,12 @@ public class LogWriter {
             originalCode = prompt.trim();
         }
 
-        // Prepare AI prompt
+        // Updated prompt with problem type, and focus on problem + fix summary
         String summaryPrompt = String.format(
-                "Problem Code:\n%s\n\nFixed Code:\n%s\n\n" +
-                        "Describe the problem and solution in the format:\n" +
-                        "Problem: <describe in one line>\nSolution: <describe in one line>",
-                originalCode, aiSuggestedCode
+                "Problem Type: %s\n\nProblem Code:\n%s\n\nFixed Code:\n%s\n\n" +
+                        "Summarize the problem and the applied fix in this format:\n" +
+                        "Problem: <describe the problem>\nSolution: <describe the fix>",
+                problemType, originalCode, aiSuggestedCode
         );
 
         try {
@@ -61,6 +60,7 @@ public class LogWriter {
             userJourneyLogs.add("⚠️ Failed to summarize: " + e.getMessage());
         }
     }
+
 
     public List<String> getUserJourneyLogs() {
         return new ArrayList<>(userJourneyLogs);
