@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 public class AITalker {
     private static final Logger log = LoggerFactory.getLogger(AITalker.class);
-    private static String REMOTE_MODEL_URL = "https://franchise-dance-flame-them.trycloudflare.com/generate";
+    // Update link here
+    private static String REMOTE_MODEL_URL = "https://fate-balloon-ea-helping.trycloudflare.com/generate";
 
     public AITalker() {}
 
