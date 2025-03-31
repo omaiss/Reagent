@@ -122,7 +122,8 @@ public class Reagent_Summary implements ToolWindowFactory {
         } else {
             int logNumber = 1;
             for (String log : userJourneyLogs) {
-                String cleanedLog = log.replace("\n", " ").replace("\"", "");
+                String cleanedLog = log;
+                cleanedLog = cleanedLog.trim();
                 cleanedLog = logNumber + ") " + cleanedLog;
                 logNumber++;
 
