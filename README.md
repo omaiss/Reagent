@@ -9,8 +9,8 @@ Here's a polished description you can use in your GitHub README for the Reagent 
 ## Features
 
 - Real-time suggestions for code fixtures based on PEP-8 guidelines
-- Seamless integration with the PyCharm IDE
-- Improves code readability and maintainability
+- Seamless integration with the PyCharm IDE
+- Improves code readability and maintainability
 
 ## Getting Started
 
