@@ -1,3 +1,23 @@
+Here's a polished description you can use in your GitHub README for the Reagent project:
+
+---
+
 # Reagent
-Final Year Project at FAST NUCES.
-We aim to develop a plugin for Pycharm that will suggest code fixtures according to the PEP-8 standards.
+
+**Reagent** is a PyCharm plugin developed as a Final Year Project at FAST NUCES. It assists developers by suggesting code fixtures that adhere to PEP-8 standards, enhancing code quality and consistency.
+
+## Features
+
+- Real-time suggestions for code fixtures based on PEP-8 guidelines
+- Seamless integration with the PyCharm IDE
+- Improves code readability and maintainability
+
+## Getting Started
+
+To use Reagent, clone the repository and follow the setup instructions provided in the documentation.
+
+## License
+
+This project is licensed under the MIT License.
+
+---
