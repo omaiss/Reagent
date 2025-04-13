@@ -140,13 +140,10 @@ public class Reagent_Summary implements ToolWindowFactory {
         } else {
             int logNumber = 1;
             for (String log : userJourneyLogs) {
-<<<<<<< HEAD
                 String cleanedLog = log;
                 cleanedLog = cleanedLog.trim();
                 cleanedLog = logNumber + ") " + cleanedLog;
-=======
                 DefaultMutableTreeNode logEntryNode = new DefaultMutableTreeNode("🔹 Interaction " + logNumber);
->>>>>>> d724a15cf251a3750020264ebcf2bead9f217a55
                 logNumber++;
                 String[] parts = log.split("\n\n");
 
