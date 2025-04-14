@@ -1,8 +1,8 @@
----
+
 
 # 🧪 Reagent – Your Smart PyCharm Assistant
 
-**Reagent** is a powerful PyCharm plugin developed as a final-year project at **FAST NUCES**. It helps Python developers by suggesting real-time code improvements based on **PEP-8 standards**, making your code cleaner, more readable, and professional.
+**Reagent** is a powerful PyCharm plugin developed as a final-year project at **FAST NUCES**. It helps Python developers by suggesting real-time code improvements based on **PEP-8 standards** and **Vulnerabilities**, making your code cleaner, more readable, and more professional.
 
 ---
 
