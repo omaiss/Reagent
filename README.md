@@ -1,5 +1,3 @@
-Here's a polished description you can use in your GitHub README for the Reagent project:
-
 ---
 
 # Reagent
