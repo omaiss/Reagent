@@ -1,72 +1,52 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import time
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
 import torch
-import os
 
 app = FastAPI()
 
-# Check if GPU is available
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using device: {device}")
 
-# Model details
 model_id = "FYPFAST/Llama-3.2-3B-Instruct-PEP8-Vulnerability-Python"
-local_model_path = "./fine-tuned-model"
 
-# Check if model is already downloaded
-if not os.path.exists(local_model_path):
-    print("Downloading model and tokenizer...")
-    model = AutoModelForCausalLM.from_pretrained(model_id)
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-
-    print(f"Saving model and tokenizer to {local_model_path}...")
-    model.save_pretrained(local_model_path)
-    tokenizer.save_pretrained(local_model_path)
-    print("Download and save completed!")
-else:
-    print("Loading model from local directory...")
-
-# Quantization configuration
-quantization_config = BitsAndBytesConfig(
+quant_config = BitsAndBytesConfig(
     load_in_4bit=True,
+    bnb_4bit_compute_dtype=torch.bfloat16,
     bnb_4bit_use_double_quant=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16
 )
 
-# Load the model and tokenizer
 model = AutoModelForCausalLM.from_pretrained(
-    local_model_path,
-    quantization_config=quantization_config,
+    model_id,
     device_map="auto",
+    quantization_config=quant_config,
 )
-tokenizer = AutoTokenizer.from_pretrained(local_model_path)
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+generator = pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer
+)
+
+class PromptRequest(BaseModel):
+    prompt: str
 
 
-class CodeRequest(BaseModel):
-    code: str
+@app.post("/generate")
+async def generate_text(request: PromptRequest):
+    if not request.prompt:
+        raise HTTPException(status_code=400, detail="No prompt provided")
+    print(request.prompt)
+    start_time = time.time()
 
+    output = generator([{"role": "user", "content": request.prompt}], max_new_tokens=1024, return_full_text=False)[0]
 
-@app.post("/analyze")
-def analyze_code(request: CodeRequest):
-    try:
-        # Prepare the input prompt
-        prompt = f"Check the following code for PEP8 standard violations and any vulnerabilities. Return the corrected, PEP8-compliant, and vulnerability-free code:\n\n{request.code}"
+    print(output["generated_text"])
+    end_time = time.time()
+    response_time = end_time - start_time
+    print(f"Response Time: {response_time:.2f} seconds")
 
-        # Tokenize the input
-        inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+    return output["generated_text"]
 
-        # Generate the output
-        outputs = model.generate(**inputs, max_new_tokens=500)
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        return {"response": response}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)

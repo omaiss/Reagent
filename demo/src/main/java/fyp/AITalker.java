@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class AITalker {
     private static final Logger log = LoggerFactory.getLogger(AITalker.class);
     // Update link here
-    private static String REMOTE_MODEL_URL = "https://fate-balloon-ea-helping.trycloudflare.com/generate";
+    private static String REMOTE_MODEL_URL = "https://aviation-monitored-graduates-papua.trycloudflare.com/generate";
 
     public AITalker() {}
 

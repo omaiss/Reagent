@@ -30,6 +30,14 @@ public class DetectVulnerabilitiesAction extends AnAction {
         if (psiFile == null) return;
 
         String code = document.getText();
+        String[] lines = code.split("\n");
+        StringBuilder numberedCode = new StringBuilder();
+
+        for (int i = 0; i < lines.length; i++) {
+            numberedCode.append(i + 1).append("  ").append(lines[i]).append("\n");
+        }
+
+        code = numberedCode.toString();
 
         try {
             List<Flake8Highlight.Violation> vulnerabilities = getVulnerabilites(code);
@@ -55,6 +63,7 @@ public class DetectVulnerabilitiesAction extends AnAction {
                 "Do not include potential or speculative issues—only those that are certain and directly present in the code.\n"
                 + "For each issue, provide the format:\n"
                 + "Line Number : Vulnerability\n"
+                + "Example:\n 15 : SQL Injection\n"
                 + "Ensure the response strictly follows this format without extra explanations.\n\n"
                 + "Code:\n"
                 + code;

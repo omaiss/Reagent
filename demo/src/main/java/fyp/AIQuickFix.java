@@ -86,7 +86,7 @@ public class AIQuickFix implements IntentionAction {
                                 "Code:\n" + userCode;
                         break;
                     case "both":
-                        prompt = "The following code has both PEP8 violations and security vulnerabilities. " +
+                        prompt = "The following code has both PEP8 violations and security vulnerabilities. Remember to add imports " +
                                 "Fix them all and return the corrected code only (NO EXPLANATION).\n\n" +
                                 "Violations:\n" + violationsText + "\n\nCode:\n" + userCode;
                         break;
@@ -145,14 +145,17 @@ public class AIQuickFix implements IntentionAction {
         // Remove both leading and trailing code block markers
         response = response.replaceAll("^```[a-zA-Z]*\\s*", "").replaceAll("\\s*```$", "");
 
+        // Remove starting and ending double quotes if present
+        response = response.replaceAll("^\"|\"$", "");
+
         // Convert escaped newlines and quotes
         response = response.replace("\\n", "\n").replace("\\\"", "\"");
 
         String[] lines = response.split("\n");
-        if (lines.length > 2) { // Ensure at least 2 lines exist to avoid errors
-            response = String.join("\n", Arrays.copyOfRange(lines, 1, lines.length - 1));
+        if (lines.length > 2) {
+            response = String.join("\n", Arrays.copyOfRange(lines, 0, lines.length));
         } else {
-            response = ""; // If there are only 1-2 lines, return an empty string
+            response = "";
         }
 
         return response.trim();
